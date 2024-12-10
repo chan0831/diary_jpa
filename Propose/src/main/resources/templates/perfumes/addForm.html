@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="../css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            max-width: 560px;
+        }
+        .field-error {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+        textarea.form-control {
+            min-height: 100px;
+            resize: none;
+        }
+    </style>
+    <script>
+        // 페이지 로드 시 텍스트 영역의 높이를 조정하는 함수
+        function adjustTextareaHeight() {
+            const textarea = document.getElementById('review');
+            if (textarea) {
+                textarea.style.height = 'auto'; // 높이를 자동으로 조정
+                textarea.style.height = textarea.scrollHeight + 'px'; // 내용에 맞게 높이 설정
+            }
+        }
+
+        // 페이지가 로드되면 adjustTextareaHeight 함수를 실행
+        window.onload = adjustTextareaHeight;
+    </script>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="py-5 text-center">
+        <h2 th:text="#{page.addPerfume}">향수 등록</h2>
+    </div>
+
+    <form action="perfume.html" th:action th:object="${perfume}" method="post">
+
+        <div th:if="${#fields.hasGlobalErrors()}">
+            <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">글로벌 오류 메시지</p>
+        </div>
+
+        <div>
+            <label for="perfumeName" th:text="#{label.perfume.perfumeName}">향수 이름</label>
+            <input type="text" id="perfumeName" th:field="*{perfumeName}"
+                   th:errorclass="field-error" class="form-control" placeholder="이름을 입력하세요">
+            <div class="field-error" th:errors="*{perfumeName}">
+                이름 입력 오류
+            </div>
+        </div>
+        <div>
+            <label for="brand" th:text="#{label.perfume.brand}">브랜드</label>
+            <input type="text" id="brand" th:field="*{brand}"
+                   th:errorclass="field-error" class="form-control" placeholder="브랜드명을 입력하세요">
+            <div class="field-error" th:errors="*{brand}">
+                브랜드명 입력 오류
+            </div>
+        </div>
+        <div>
+            <label for="date" th:text="#{label.perfume.date}">시향 날짜</label>
+            <input type="text" id="date" th:field="*{date}"
+                   th:errorclass="field-error" class="form-control" placeholder="시향 날짜를 입력하세요">
+            <div class="field-error" th:errors="*{date}">
+                시향 날짜 입력 오류
+            </div>
+        </div>
+
+        <hr class="my-4">
+        <!-- multi checkbox -->
+        <div>
+            <div>메인 어코드 (중복 선택 가능)</div>
+            <div th:each="accords : ${accords}" class="form-check form-check-inline">
+                <input type="checkbox" th:field="*{accords}" th:value="${accords.key}"
+                       class="form-check-input">
+                <label th:for="${#ids.prev('accords')}"
+                       th:text="${accords.value}" class="form-check-label">spicy</label>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div>
+            <label for="topNote" th:text="#{label.perfume.topNote}">탑노트</label>
+            <input type="text" id="topNote" th:field="*{topNote}"
+                   th:errorclass="field-error" class="form-control" placeholder="탑노트를 입력하세요">
+            <div class="field-error" th:errors="*{topNote}">
+                탑노트 입력 오류
+            </div>
+        </div>
+        <div>
+            <label for="middleNote" th:text="#{label.perfume.middleNote}">미들노트</label>
+            <input type="text" id="middleNote" th:field="*{middleNote}"
+                   th:errorclass="field-error" class="form-control" placeholder="미들노트를 입력하세요">
+            <div class="field-error" th:errors="*{middleNote}">
+                미들노트 입력 오류
+            </div>
+        </div>
+        <div>
+            <label for="baseNote" th:text="#{label.perfume.baseNote}">베이스노트</label>
+            <input type="text" id="baseNote" th:field="*{baseNote}"
+                   th:errorclass="field-error" class="form-control" placeholder="베이스노트를 입력하세요">
+            <div class="field-error" th:errors="*{baseNote}">
+                베이스노트 입력 오류
+            </div>
+        </div>
+
+        <hr class="my-4">
+        <!-- multi checkbox -->
+        <div>
+            <div>어울리는 계절 (중복 선택 가능)</div>
+            <div th:each="season : ${season}" class="form-check form-check-inline">
+                <input type="checkbox" th:field="*{season}" th:value="${season.key}"
+                       class="form-check-input">
+                <label th:for="${#ids.prev('season')}"
+                       th:text="${season.value}" class="form-check-label">spring</label>
+            </div>
+        </div>
+        <!-- SELECT -->
+        <div>
+            <div>이 향수의 점수는?</div>
+
+            <select th:field="*{rating}" class="form-select">
+                <option value="">==(5점 만점!)==</option>
+                <option th:each="rating : ${rating}" th:value="${rating.code}"
+                        th:text="${rating.displayName}">5.0</option>
+            </select>
+
+        </div>
+        <div>
+            <label for="review" th:text="#{label.perfume.review}">한줄평</label>
+            <textarea id="review" name="한줄평"  th:field="*{review}"
+                      th:errorclass="field-error" class="form-control" placeholder="한줄평을 입력하세요"></textarea>
+            <div class="field-error" th:errors="*{review}">
+                내용 입력 오류
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="row">
+            <div class="col">
+                <button class="w-100 btn btn-primary btn-lg" type="submit" th:text="#{button.save}">저장</button>
+            </div>
+            <div class="col">
+                <button class="w-100 btn btn-secondary btn-lg"
+                        onclick="location.href='perfumes.html'"
+                        th:onclick="|location.href='@{/perfumes/perfumes}'|"
+                        type="button" th:text="#{button.cancel}">취소</button>
+            </div>
+        </div>
+
+    </form>
+
+</div> <!-- /container -->
+</body>
+</html>

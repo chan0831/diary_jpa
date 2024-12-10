@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="../css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            max-width: 560px;
+        }
+        textarea.form-control {
+            min-height: 100px;
+            resize: none;
+        }
+    </style>
+    <script>
+        // 페이지 로드 시 텍스트 영역의 높이를 조정하는 함수
+        function adjustTextareaHeight() {
+            const textarea = document.getElementById('review');
+            if (textarea) {
+                textarea.style.height = 'auto'; // 높이를 자동으로 조정
+                textarea.style.height = textarea.scrollHeight + 'px'; // 내용에 맞게 높이 설정
+            }
+        }
+
+        // 페이지가 로드되면 adjustTextareaHeight 함수를 실행
+        window.onload = adjustTextareaHeight;
+    </script>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="py-5 text-center">
+        <h2 th:text="#{page.perfume}">향수 상세 정보</h2>
+    </div>
+
+    <!-- 추가 -->
+    <h2 th:if="${param.status}" th:text="'저장 완료'"></h2>
+
+    <div>
+        <label for="perfumeName" th:text="#{label.perfume.perfumeName}">향수 이름</label>
+        <input type="text" id="perfumeName" name="perfumeName" class="form-control" value="향수 이름" th:value="${perfume.perfumeName}" readonly>
+    </div>
+    <div>
+        <label for="brand" th:text="#{label.perfume.brand}">브랜드명</label>
+        <input type="text" id="brand" name="brand" class="form-control" value="xxx" th:value="${perfume.brand}" readonly>
+    </div>
+    <div>
+        <label for="date" th:text="#{label.perfume.date}">시향 날짜</label>
+        <input type="text" id="date" name="date" class="form-control" value="23.05.07" th:value="${perfume.date}" readonly>
+    </div>
+
+    <hr class="my-4">
+
+    <!-- multi checkbox -->
+    <div>
+        <div>메인 어코드</div>
+        <div th:each="accords : ${accords}" class="form-check form-check-inline">
+            <input type="checkbox" th:field="${perfume.accords}" th:value="${accords.key}" class="form-check-input" disabled>
+            <label th:for="${#ids.prev('accords')}"
+                   th:text="${accords.value}" class="form-check-label">spicy</label>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <div>
+        <label for="topNote" th:text="#{label.perfume.topNote}">탑노트</label>
+        <input type="text" id="topNote" name="topNote" class="form-control" value="a" th:value="${perfume.topNote}" readonly>
+    </div>
+    <div>
+        <label for="middleNote" th:text="#{label.perfume.middleNote}">미들노트</label>
+        <input type="text" id="middleNote" name="middleNote" class="form-control" value="b" th:value="${perfume.middleNote}" readonly>
+    </div>
+    <div>
+        <label for="baseNote" th:text="#{label.perfume.baseNote}">베이스노트</label>
+        <input type="text" id="baseNote" name="baseNote" class="form-control" value="c" th:value="${perfume.baseNote}" readonly>
+    </div>
+
+    <hr class="my-4">
+
+    <!-- multi checkbox -->
+    <div>
+        <div>어울리는 계절</div>
+        <div th:each="season : ${season}" class="form-check form-check-inline">
+            <input type="checkbox" th:field="${perfume.season}" th:value="${season.key}" class="form-check-input" disabled>
+            <label th:for="${#ids.prev('season')}"
+                   th:text="${season.value}" class="form-check-label">spring</label>
+        </div>
+    </div>
+    <!-- SELECT -->
+    <div>
+        <div>이 향수의 점수는?</div>
+        <select th:field="${perfume.rating}" class="form-select" disabled>
+            <option value="">==(5점 만점!)==</option>
+            <option th:each="rating : ${rating}" th:value="${rating.code}"
+                    th:text="${rating.displayName}">5.0</option>
+        </select>
+    </div>
+    <div>
+        <label for="review" th:text="#{label.perfume.review}">한줄평</label>
+        <textarea id="review" name="review" class="form-control" readonly th:text="${perfume.review}"></textarea>
+    </div>
+
+    <hr class="my-4">
+
+    <div class="row">
+        <div class="col">
+            <button class="w-100 btn btn-primary btn-lg"
+                    onclick="location.href='editForm.html'"
+                    th:onclick="|location.href='@{/perfumes/perfumes/{perfumeId}/edit(perfumeId=${perfume.id})}'|"
+                    type="button" th:text="#{page.updatePerfume}">향수 정보 수정</button>
+        </div>
+        <div class="col">
+            <button class="w-100 btn btn-secondary btn-lg"
+                    onclick="location.href='letters.html'"
+                    th:onclick="|location.href='@{/perfumes}'|"
+                    type="button" th:text="#{button.cancel}">향수 메인으로</button>
+        </div>
+    </div>
+
+</div> <!-- /container -->
+</body>
+</html>
