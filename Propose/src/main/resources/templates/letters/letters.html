@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="../css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container" style="max-width: 600px">
+    <div class="py-5 text-center">
+        <h2 th:text="#{page.letters}">일기 목록</h2>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-primary float-end"
+                    onclick="location.href='addForm.html'"
+                    th:onclick="|location.href='@{/letters/add}'|"
+                    type="button" th:text="#{page.addLetter}">일기 작성</button>
+        </div>
+    </div>
+
+    <hr class="my-4">
+    <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th th:text="#{label.letter.id}">ID</th>
+                <th th:text="#{label.letter.title}">제목</th>
+                <th th:text="#{label.letter.date}">날짜</th>
+                <th th:text="#{label.letter.day}">몇 번째 날</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="letter : ${letters}">
+                <td><a href="letter.html" th:href="@{/letters/{letterId}(letterId=${letter.id})}" th:text="${letter.id}">순번</a></td>
+                <td><a href="letter.html" th:href="@{|/letters/${letter.id}|}" th:text="${letter.title}">제목</a></td>
+                <td th:text="${letter.date}">날짜</td>
+                <td th:text="${letter.day}">며칠</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr class="my-4">
+
+    <div class="row">
+        <div class="col">
+            <button class="w-100 btn-primary btn-lg"
+                    onclick="location.href='loginHome.html'"
+                    th:onclick="|location.href='@{/}'|"
+                    type="button" th:text="#{button.cancel}">취소</button>
+        </div>
+    </div>
+
+</div> <!-- /container -->
+
+</body>
+</html>
