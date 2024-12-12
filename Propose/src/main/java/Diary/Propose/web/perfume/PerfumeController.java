@@ -2,13 +2,17 @@ package Diary.Propose.web.perfume;
 
 import Diary.Propose.apiPayload.code.status.ErrorStatus;
 import Diary.Propose.apiPayload.exception.GeneralException;
+import Diary.Propose.domain.SessionConst;
 import Diary.Propose.domain.letter.Score;
+import Diary.Propose.domain.member.Member;
 import Diary.Propose.domain.perfume.Perfume;
 import Diary.Propose.domain.perfume.PerfumeCommandService;
 import Diary.Propose.domain.perfume.PerfumeRepository;
 import Diary.Propose.domain.perfume.Rating;
 import Diary.Propose.web.converter.PerfumeConverter;
 import Diary.Propose.web.perfume.form.PerfumeSaveForm;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -108,8 +112,12 @@ public class PerfumeController {
     }
 
     @GetMapping("/perfumes")
-    public String perfumes(Model model){
-        List<Perfume> perfumes = perfumeRepository.findAll();
+    public String perfumes(Model model, HttpServletRequest request){
+
+        HttpSession session = request.getSession(false);
+        Member loginMember = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
+
+        List<Perfume> perfumes = perfumeRepository.findByMember(loginMember);
         model.addAttribute("perfumes", perfumes);
         return "perfumes/perfumes";
     }
@@ -121,14 +129,14 @@ public class PerfumeController {
     }
 
     @PostMapping("/add")
-    public String addPerfume(@Validated @ModelAttribute ("perfume")PerfumeSaveForm form, BindingResult bindingResult, RedirectAttributes redirectAttributes){
+    public String addPerfume(@Validated @ModelAttribute ("perfume")PerfumeSaveForm form, BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession session){
 
         if(bindingResult.hasErrors()){
             log.info("errors{}=", bindingResult);
             return "perfumes/addForm";
         }
-
-        Perfume perfume = PerfumeConverter.toPerfume(form);
+        Member loginMember = (Member) session.getAttribute("loginMember");
+        Perfume perfume = PerfumeConverter.toPerfume(form, loginMember);
 //        perfume.setPerfumeName(form.getPerfumeName());
 //        perfume.setBrand(form.getBrand());
 //        perfume.setDate(form.getDate());

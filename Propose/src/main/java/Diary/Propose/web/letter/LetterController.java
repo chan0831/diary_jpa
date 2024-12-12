@@ -2,11 +2,13 @@ package Diary.Propose.web.letter;
 
 import Diary.Propose.apiPayload.code.status.ErrorStatus;
 import Diary.Propose.apiPayload.exception.GeneralException;
+import Diary.Propose.domain.SessionConst;
 import Diary.Propose.domain.letter.*;
 import Diary.Propose.domain.member.Member;
 import Diary.Propose.domain.perfume.PerfumeCommandService;
 import Diary.Propose.web.converter.LetterConverter;
 import Diary.Propose.web.letter.form.LetterSaveForm;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,9 +53,20 @@ public class LetterController {
 
         return score;
     }
+//    @GetMapping
+//    public String letters(Model model){
+//        List<Letter> letters = letterRepository.findAll();
+//        model.addAttribute("letters", letters);
+//        return "letters/letters";
+//    }
+    //이제, 로그인한 사용자별로 자기 일기만 볼 수 있도록 수정
     @GetMapping
-    public String letters(Model model){
-        List<Letter> letters = letterRepository.findAll();
+    public String letters(Model model, HttpServletRequest request){
+
+        HttpSession session = request.getSession(false);
+        Member loginMember = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
+
+        List<Letter> letters = letterRepository.findByMember(loginMember);
         model.addAttribute("letters", letters);
         return "letters/letters";
     }

@@ -1,6 +1,9 @@
 package Diary.Propose.domain.perfume;
 
+import Diary.Propose.domain.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 
 //
 //import org.springframework.stereotype.Repository;
@@ -12,6 +15,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 //
 //@Repository
 public interface PerfumeRepository extends JpaRepository<Perfume, Long> {
+    List<Perfume> findByMember(Member loginMember);
 //
 //    private static final Map<Long, Perfume> store = new HashMap<>();
 //

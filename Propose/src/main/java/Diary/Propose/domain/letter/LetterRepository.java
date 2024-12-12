@@ -1,5 +1,6 @@
 package Diary.Propose.domain.letter;
 
+import Diary.Propose.domain.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,6 +11,7 @@ import java.util.Map;
 
 
 public interface LetterRepository extends JpaRepository<Letter, Long> {
+    List<Letter> findByMember(Member member);
 
 //    private static final Map<Long, Letter> store = new HashMap<>();
 //    private static long sequence = 0L;
