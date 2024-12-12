@@ -3,12 +3,17 @@ package Diary.Propose.web.perfume.form;
 import Diary.Propose.domain.perfume.PerfumeRepository;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @Data
+@Builder
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 public class PerfumeSaveForm {
 
     @NotBlank
@@ -38,10 +43,10 @@ public class PerfumeSaveForm {
     @NotBlank
     private String review;
 
-    @NotNull
-    private Long photoId;
-
-    private String photoName;
-    private MultipartFile attachFile;
-    private List<MultipartFile> imageFiles;
+//    @NotNull
+//    private Long photoId;
+//
+//    private String photoName;
+//    private MultipartFile attachFile;
+//    private List<MultipartFile> imageFiles;
 }

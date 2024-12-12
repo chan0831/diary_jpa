@@ -1,10 +1,13 @@
 package Diary.Propose.web.letter;
 
-import Diary.Propose.domain.letter.Letter;
-import Diary.Propose.domain.letter.LetterRepository;
-import Diary.Propose.domain.letter.LetterType;
-import Diary.Propose.domain.letter.Score;
+import Diary.Propose.apiPayload.code.status.ErrorStatus;
+import Diary.Propose.apiPayload.exception.GeneralException;
+import Diary.Propose.domain.letter.*;
+import Diary.Propose.domain.member.Member;
+import Diary.Propose.domain.perfume.PerfumeCommandService;
+import Diary.Propose.web.converter.LetterConverter;
 import Diary.Propose.web.letter.form.LetterSaveForm;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -24,6 +27,8 @@ import java.util.List;
 public class LetterController {
 
     private final LetterRepository letterRepository;
+    private final PerfumeCommandService perfumeCommandService;
+    private final LetterCommandService letterCommandService;
 
     @ModelAttribute("letterType")
     public LetterType[] letterTypes() {return LetterType.values();}
@@ -55,19 +60,22 @@ public class LetterController {
 
     @GetMapping("/{letterId}")
     public String letter(@PathVariable long letterId, Model model){
-        Letter letter = letterRepository.findById(letterId);
+        Letter letter = letterRepository.findById(letterId)
+                .orElseThrow(()-> new GeneralException(ErrorStatus.LETTER_NOT_FOUND));
         model.addAttribute("letter", letter);
         return "letters/letter";
     }
 
     @GetMapping("/add")
     public String addForm(Model model){
-        model.addAttribute("letter" , new Letter());
+    model.addAttribute("letter" , new LetterSaveForm());
         return "letters/addForm";
     }
 
     @PostMapping("/add")
-    public String addLetter(@Validated @ModelAttribute ("letter")LetterSaveForm form, BindingResult bindingResult, RedirectAttributes redirectAttributes){
+    public String addLetter(@Validated @ModelAttribute ("letter")LetterSaveForm form, BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession session){
+
+        log.info("Form data: {}", form);
 
         if(bindingResult.hasErrors()){
             log.info("errors{}=", bindingResult);
@@ -75,33 +83,40 @@ public class LetterController {
         }
 
         //성공 로직
-        Letter letter = new Letter();
-        letter.setTitle(form.getTitle());
-        letter.setDate(form.getDate());
-        letter.setDay(form.getDay());
-        letter.setContents(form.getContents());
+//        Letter letter = new Letter();
+//        letter.setTitle(form.getTitle());
+//        letter.setDate(form.getDate());
+//        letter.setDay(form.getDay());
+//        letter.setContents(form.getContents());
+//
+//        letter.setLetterType(form.getLetterType());
+//        letter.setScore(form.getScore());
+        // 데이터가 바인딩되었는지 확인하기 위해 form을 로그로 출력
+        Member member = (Member) session.getAttribute("loginMember");
 
-        letter.setLetterType(form.getLetterType());
-        letter.setScore(form.getScore());
+        Letter newLetter = LetterConverter.toNewLetter(form, member);
 
 
-        Letter savedLetter = letterRepository.save(letter);
+        letterRepository.save(newLetter);
 
-        redirectAttributes.addAttribute("letterId", savedLetter.getId());
+        redirectAttributes.addAttribute("letterId", newLetter.getId());
         redirectAttributes.addAttribute("status", true);
         return "redirect:/letters/{letterId}";
     }
 
     @GetMapping("/{letterId}/edit")
     public String editForm(@PathVariable Long letterId, Model model){
-        Letter letter = letterRepository.findById(letterId);
+        Letter letter = letterRepository.findById(letterId)
+                .orElseThrow(()-> new GeneralException(ErrorStatus.LETTER_NOT_FOUND));
+
         model.addAttribute("letter", letter);
         return "letters/editForm";
     }
 
     @PostMapping("/{letterId}/edit")
     public String edit(@PathVariable Long letterId, @ModelAttribute Letter letter){
-        letterRepository.update(letterId, letter);
+        letterCommandService.updateLetter(letterId, letter);
+
         return "redirect:/letters/{letterId}";
     }
 }

@@ -1,9 +1,13 @@
 package Diary.Propose.web.perfume;
 
+import Diary.Propose.apiPayload.code.status.ErrorStatus;
+import Diary.Propose.apiPayload.exception.GeneralException;
 import Diary.Propose.domain.letter.Score;
 import Diary.Propose.domain.perfume.Perfume;
+import Diary.Propose.domain.perfume.PerfumeCommandService;
 import Diary.Propose.domain.perfume.PerfumeRepository;
 import Diary.Propose.domain.perfume.Rating;
+import Diary.Propose.web.converter.PerfumeConverter;
 import Diary.Propose.web.perfume.form.PerfumeSaveForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +35,7 @@ import java.util.Map;
 public class PerfumeController {
 
     private final PerfumeRepository perfumeRepository;
+    private final PerfumeCommandService perfumeCommandService;
 
     @ModelAttribute("rating")
     public List<Rating> rating(){
@@ -95,7 +100,9 @@ public class PerfumeController {
 
     @GetMapping("/perfumes/{perfumeId}")
     public String perfume(@PathVariable long perfumeId, Model model){
-        Perfume perfume = perfumeRepository.findById(perfumeId);
+        Perfume perfume = perfumeRepository.findById(perfumeId)
+                        .orElseThrow(()->new GeneralException(ErrorStatus.PERFUME_NOT_FOUND));
+
         model.addAttribute("perfume", perfume);
         return "perfumes/perfume";
     }
@@ -121,17 +128,17 @@ public class PerfumeController {
             return "perfumes/addForm";
         }
 
-        Perfume perfume = new Perfume();
-        perfume.setPerfumeName(form.getPerfumeName());
-        perfume.setBrand(form.getBrand());
-        perfume.setDate(form.getDate());
-        perfume.setAccords(form.getAccords());
-        perfume.setTopNote(form.getTopNote());
-        perfume.setMiddleNote(form.getMiddleNote());
-        perfume.setBaseNote(form.getBaseNote());
-        perfume.setSeason(form.getSeason());
-        perfume.setRating(form.getRating());
-        perfume.setReview(form.getReview());
+        Perfume perfume = PerfumeConverter.toPerfume(form);
+//        perfume.setPerfumeName(form.getPerfumeName());
+//        perfume.setBrand(form.getBrand());
+//        perfume.setDate(form.getDate());
+//        perfume.setAccords(form.getAccords());
+//        perfume.setTopNote(form.getTopNote());
+//        perfume.setMiddleNote(form.getMiddleNote());
+//        perfume.setBaseNote(form.getBaseNote());
+//        perfume.setSeason(form.getSeason());
+//        perfume.setRating(form.getRating());
+//        perfume.setReview(form.getReview());
 
         Perfume savedPerfume = perfumeRepository.save(perfume);
 
@@ -142,14 +149,18 @@ public class PerfumeController {
 
     @GetMapping("/perfumes/{perfumeId}/edit")
     public String editForm(@PathVariable Long perfumeId, Model model){
-        Perfume perfume = perfumeRepository.findById(perfumeId);
+        Perfume perfume = perfumeRepository.findById(perfumeId)
+                .orElseThrow(()->new GeneralException(ErrorStatus.PERFUME_NOT_FOUND));
+
         model.addAttribute("perfume", perfume);
         return "perfumes/editForm";
     }
 
     @PostMapping("/perfumes/{perfumeId}/edit")
-    public String edit(@PathVariable Long perfumeId, @ModelAttribute Perfume perfume){
-        perfumeRepository.update(perfumeId, perfume);
+    public String edit(@PathVariable Long perfumeId, @ModelAttribute Perfume updatePerfume){
+
+        perfumeCommandService.update(perfumeId, updatePerfume);
+
         return "redirect:/perfumes/perfumes/{perfumeId}";
     }
 }

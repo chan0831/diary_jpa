@@ -15,7 +15,7 @@ spring:
   application:
     name: Propose
   datasource:
-    url: jdbc:mysql://localhost:3306/hospital
+    url: jdbc:mysql://localhost:3306/diary
     username: root
     password: a123456789
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -32,6 +32,10 @@ spring:
         hbm2ddl:
           auto: create
         default_batch_fetch_size: 1000
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
 
 
 
